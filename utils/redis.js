@@ -1,14 +1,54 @@
-const { createServer } = require('node:http');
+const redis = require('redis');
 
-const hostname = '127.0.0.1';
-const port = 3000;
+class RedisClient {
+  constructor() {
+    this.client = redis.createClient();
 
-const server = createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World');
-});
+    this.client.on('error', (err) => {
+      console.log(`Redis client not connected to the server: ${err}`);
+    });
+  }
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+  isAlive() {
+    return this.client.connected;
+  }
+
+  async get(key) {
+    return new Promise((resolve, reject) => {
+      this.client.get(key, (err, reply) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(reply);
+        }
+      });
+    });
+  }
+
+  async set(key, value, duration) {
+    return new Promise((resolve, reject) => {
+      this.client.set(key, value, 'EX', duration, (err, reply) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(reply);
+        }
+      });
+    });
+  }
+
+  async del(key) {
+    return new Promise((resolve, reject) => {
+      this.client.del(key, (err, reply) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(reply);
+        }
+      });
+    });
+  }
+}
+
+const redisClient = new RedisClient();
+module.exports = redisClient;
