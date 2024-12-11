@@ -1,5 +1,19 @@
 const redis = require('redis');
 
+/**
+ * Class to handle Redis client operations
+ * @class RedisClient
+ * @description Creates and manages a Redis client connection with methods for basic Redis operations
+ * @property {Object} client - Redis client instance
+ * @throws {Error} When Redis connection fails
+ * @example
+ * const redisClient = new RedisClient();
+ * @methods
+ * - isAlive(): Checks if connection is alive
+ * - get(key): Gets value for a key
+ * - set(key, value, duration): Sets key-value pair with expiration
+ * - del(key): Deletes a key
+ */
 class RedisClient {
   constructor() {
     this.client = redis.createClient();
